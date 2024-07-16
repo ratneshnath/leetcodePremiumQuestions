@@ -95,6 +95,88 @@ insert into Votes (voter, candidate) values ('Arthur', 'Christine');
 
 Solution:
 
+WITH CTE AS(
+SELECT voter, ROUND(1.0/(COUNT(*)*1.0),1) AS votecount
+FROM votes
+GROUP BY voter),
+
+CTE2 AS(
+SELECT candidate , SUM(votecount) AS finalResult
+FROM votes V
+LEFT JOIN CTE C ON
+V.voter = C.voter
+WHERE candidate is not null
+GROUP BY candidate
+)
+select candidate from CTE2
+where finalResult = (select max(finalResult) from CTE2)
+order by candidate 
+
+Q3)
+
+Interview SQL Question Level: Easy
+Company: Capegemini.
+Find the number of Languages in skills column. And return Id, skills, total_count.
+
+Schema:
+
+CREATE TABLE skills (
+ id INT,
+ skills VARCHAR(255)
+);
+
+INSERT INTO skills (id, skills) VALUES
+(1, 'Sql, Plsql, Oracle'),
+(2, 'Database, Mysql');
+
+Solution:
+
+select id,skills,length(skills)-length(replace(skills,',',''))+1 from skills
+
+Q4)
+
+Interview SQL Question Level: Unique.
+***Must Try
+Find no of Vacant positions available based on totalPost.
+
+Schema:
+
+create table job_positions
+(
+ id int,
+ title varchar(100),
+ group_s varchar(10),
+ level_s varchar(10),
+ payscale int,
+ totalpost int
+);
+insert into job_positions values (1, 'General manager', 'A', 'l-15', 10000, 1);
+insert into job_positions values (2, 'Manager', 'B', 'l-14', 9000, 5);
+insert into job_positions values (3, 'Asst. Manager', 'C', 'l-13', 8000, 10);
+
+drop table if exists job_employees;
+create table job_employees
+(
+ id int,
+ name varchar(100),
+ position_id int
+);
+insert into job_employees values (1, 'John Smith', 1);
+insert into job_employees values (2, 'Jane Doe', 2);
+insert into job_employees values (3, 'Michael Brown', 2);
+insert into job_employees values (4, 'Emily Johnson', 2);
+insert into job_employees values (5, 'William Lee', 3);
+insert into job_employees values (6, 'Jessica Clark', 3);
+insert into job_employees values (7, 'Christopher Harris', 3);
+insert into job_employees values (8, 'Olivia Wilson', 3);
+insert into job_employees values (9, 'Daniel Martinez', 3);
+insert into job_employees values (10, 'Sophia Miller', 3);
+
+Solution:
+
+
+
+
 
 
 
