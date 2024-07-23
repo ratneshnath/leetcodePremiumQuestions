@@ -175,6 +175,57 @@ insert into job_employees values (10, 'Sophia Miller', 3);
 Solution:
 
 
+Q5) write a query to find out callers whose first and last call was to the same person on a given day
+Schema:
+
+create table phonelog(
+    callerid int, 
+    recipientid int,
+    datecalled datetime
+);
+
+insert into phonelog(callerid, recipientid, datecalled)
+values(1, 2, '2019-01-01 09:00:00.000'),
+       (1, 3, '2019-01-01 17:00:00.000'),
+       (1, 4, '2019-01-01 23:00:00.000'),
+       (2, 5, '2019-07-05 09:00:00.000'),
+       (2, 3, '2019-07-05 17:00:00.000'),
+       (2, 3, '2019-07-05 17:20:00.000'),
+       (2, 5, '2019-07-05 23:00:00.000'),
+       (2, 3, '2019-08-01 09:00:00.000'),
+       (2, 3, '2019-08-01 17:00:00.000'),
+       (2, 5, '2019-08-01 19:30:00.000'),
+       (2, 4, '2019-08-02 09:00:00.000'),
+       (2, 5, '2019-08-02 10:00:00.000'),
+       (2, 5, '2019-08-02 10:45:00.000'),
+       (2, 4, '2019-08-02 11:00:00.000');
+
+
+Solution:
+/*
+write a query to find out callers whose first and last call was to the same person on a given day
+*/
+with cte as
+(
+select callerid,cast(datecalled as date) as called_date,min(datecalled) as first_call,max(datecalled) as last_call
+from phonelog
+group by callerid,cast(datecalled as date)
+)
+select c.*,p1.recipientid
+from cte c
+inner join phonelog p1
+on p1.callerid = c.callerid and c.first_call = p1.datecalled
+inner join phonelog p2
+on p2.callerid = c.callerid and c.last_call = p2.datecalled
+where p1.recipientid = p2.recipientid
+
+Q6)
+
+
+
+
+ 
+
 
 
 
