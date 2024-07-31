@@ -219,8 +219,29 @@ inner join phonelog p2
 on p2.callerid = c.callerid and c.last_call = p2.datecalled
 where p1.recipientid = p2.recipientid
 
-Q6)
+Q6) Unique Conversation Threads
+ write a query to determine the number of unique conversation threads in the messenger_sends table.
 
+A unique conversation thread is defined as a unique pair of sender_id and receiver_id, where the direction of the message (who sent to whom) does not matter. In other words, the pair (1, 2) should be considered the same as (2, 1).
+
+messenger_sends table:
+
+COLUMN NAME         	DESCRIPTION
+sender_id             ID of the user sending the message
+receiver_id	          ID of the user receiving the message
+
+
+Solution:
+
+with cte as
+ (
+    SELECT 
+        CASE WHEN sender_id < receiver_id THEN sender_id ELSE receiver_id END AS least_value,
+        CASE WHEN sender_id > receiver_id THEN sender_id ELSE receiver_id END AS greatest_value
+        
+    FROM messenger_sends
+) 
+SELECT COUNT(DISTINCT concat(least_value, greatest_value)) AS unique_conversations from cte
 
 
 
