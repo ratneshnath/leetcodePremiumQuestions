@@ -321,6 +321,36 @@ group by seller_id,product_category,market_place,month
 )
 select seller_id,total_sales,product_category,market_place,month from cte
 where rn <= 3
+
+Q.10) Write a SQL query to get total number of sms exchanged between users each day.
+Note: This is also known as horizontal sorting in SQL.
+
+Schema:
+
+CREATE TABLE subscriber (
+ sms_date date ,
+ sender varchar(20) ,
+ receiver varchar(20) ,
+ sms_no int);
+
+INSERT INTO subscriber VALUES ('2020-4-1', 'Avinash', 'Vibhor',10);
+INSERT INTO subscriber VALUES ('2020-4-1', 'Vibhor', 'Avinash',20);
+INSERT INTO subscriber VALUES ('2020-4-1', 'Avinash', 'Pawan',30);
+INSERT INTO subscriber VALUES ('2020-4-1', 'Pawan', 'Avinash',20);
+INSERT INTO subscriber VALUES ('2020-4-1', 'Vibhor', 'Pawan',5);
+INSERT INTO subscriber VALUES ('2020-4-1', 'Pawan', 'Vibhor',8);
+INSERT INTO subscriber VALUES ('2020-4-1', 'Vibhor', 'Deepak',50);
+
+Solution:
+
+with cte as
+(select *,
+case when sender<receiver then receiver else sender end as p1,
+case when sender>receiver then receiver else sender end as p2
+from subscriber
+)
+ select p1,p2,sms_date, sum(sms_no) from cte
+ group by sms_date, p1,p2
  
 
 
