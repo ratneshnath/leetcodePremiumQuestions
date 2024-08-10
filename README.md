@@ -304,8 +304,23 @@ on t.operator_id = o.id
 select * from cte 
 where rn = 1
 
+Q.9) Stratascratch
+You are provided with a transactional dataset from Amazon that contains detailed information about sales across different products and marketplaces. Your task is to list the top 3 sellers in each product category for January.
+The output should contain 'seller_id' , 'total_sales' ,'product_category' , 'market_place', and 'month'.
 
 
+Solution:
+
+with cte as
+(
+select seller_id,sum(total_sales) as total_sales,product_category,market_place,month,
+row_number() over(partition by product_category order by sum(total_sales) desc) as rn
+from sales_data
+where  month = '2024-01'
+group by seller_id,product_category,market_place,month
+)
+select seller_id,total_sales,product_category,market_place,month from cte
+where rn <= 3
  
 
 
