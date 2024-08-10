@@ -274,6 +274,36 @@ SELECT *
 FROM CTE
 WHERE in_time>out_time or out_time is NULL;
 
+Q.8) Write a SQL query to find out the latest status of each ride and the operator name for that ride.
+
+Schema:
+
+CREATE TABLE operators (id INT,name VARCHAR(20));
+INSERT INTO operators VALUES(1,'Pradeep');
+INSERT INTO operators VALUES(2,'Rajeev');
+INSERT INTO operators VALUES(3,'Pawan');
+
+CREATE TABLE trips (ride_id INT,status VARCHAR(20),operator_id INT,date_time TIMESTAMP);
+INSERT INTO trips VALUES(1,'Cancelled',2,'2024-01-01 18:30:45');
+INSERT INTO trips VALUES(1,'Cancelled',1,'2024-01-01 18:36:55');
+INSERT INTO trips VALUES(1,'Completed',3,'2024-01-01 18:37:23');
+INSERT INTO trips VALUES(2,'Cancelled',1,'2024-01-01 20:30:47');
+INSERT INTO trips VALUES(2,'Cancelled',2,'2024-01-01 20:32:50');
+INSERT INTO trips VALUES(3,'Cancelled',3,'2024-01-01 16:30:11');
+
+Solution:
+
+with cte as
+(
+select ride_id,status,name as operator_name,date_time,
+row_number() over(partition by operator_id order by date_time desc) as rn
+from operators o 
+join trips t
+on t.operator_id = o.id
+)
+select * from cte 
+where rn = 1
+
 
 
  
