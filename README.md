@@ -351,7 +351,115 @@ from subscriber
 )
  select p1,p2,sms_date, sum(sms_no) from cte
  group by sms_date, p1,p2
- 
+
+ Q.11)
+
+ Schema: 
+
+ create table bms (seat_no int ,is_empty varchar(10));
+insert into bms values
+(1,'N')
+,(2,'Y')
+,(3,'N')
+,(4,'Y')
+,(5,'Y')
+,(6,'Y')
+,(7,'N')
+,(8,'Y')
+,(9,'Y')
+,(10,'Y')
+,(11,'Y')
+,(12,'N')
+,(13,'Y')
+,(14,'Y');
+
+
+Solution:
+
+(1) 
+with cte as
+(
+select *,
+lag(is_empty,1) over(order by seat_no) as prev1,
+lag(is_empty,2) over(order by seat_no) as prev2,
+lead(is_empty,1) over(order by seat_no) as next1,
+lead(is_empty,2) over(order by seat_no) as next2
+from bms
+)
+select * from cte
+where is_empty='Y' and prev1 = 'Y' and prev2 = 'Y'
+or ( is_empty='Y' and next1 = 'Y' and next2 = 'Y')
+or ( is_empty='Y' and prev1 = 'Y' and next1 = 'Y')
+
+(2)
+with cte as
+(
+select *,
+sum(case when is_empty = 'Y' then 1 else 0 end) over(order by seat_no rows between 2 preceding and current row) as prev2,
+sum(case when is_empty = 'Y' then 1 else 0 end) over(order by seat_no rows between 1 preceding and 1 following) as prevnext1,
+sum(case when is_empty = 'Y' then 1 else 0 end) over(order by seat_no rows between current row and 2 following) as next2
+from bms
+)
+select * from cte
+where prev2 = 3 or prevnext1 = 3 or next2 = 3
+
+(3) 
+
+with cte as
+(
+select *,
+row_number() over(order by seat_no) as rn,
+seat_no-row_number() over(order by seat_no) as diff
+from bms
+where is_empty = 'Y'  
+)
+select diff,count(diff) from cte
+group by diff having count(diff)>=3
+
+Q.12) 
+/*
+We have a swipe table which keeps track of the employee login and logout timings.
+1. Find out the time employee person spent in the office on a particular day (office hour = last logout time - first login time)
+2. Find out how productive he was at office on a particular day. (He might have many swipes per day. We need to find the actual time spent at the office.
+*/
+
+ Schema: 
+
+ CREATE TABLE swipe (
+    employee_id INT,
+    activity_type VARCHAR(10),
+    activity_time datetime
+);
+
+-- Insert sample data
+INSERT INTO swipe (employee_id, activity_type, activity_time) VALUES
+(1, 'login', '2024-07-23 08:00:00'),
+(1, 'logout', '2024-07-23 12:00:00'),
+(1, 'login', '2024-07-23 13:00:00'),
+(1, 'logout', '2024-07-23 17:00:00'),
+(2, 'login', '2024-07-23 09:00:00'),
+(2, 'logout', '2024-07-23 11:00:00'),
+(2, 'login', '2024-07-23 12:00:00'),
+(2, 'logout', '2024-07-23 15:00:00'),
+(1, 'login', '2024-07-24 08:30:00'),
+(1, 'logout', '2024-07-24 12:30:00'),
+(2, 'login', '2024-07-24 09:30:00'),
+(2, 'logout', '2024-07-24 10:30:00');
+
+Solution:
+
+with cte as
+(
+select *,cast(activity_time as date) as activity_day,
+lead(activity_time,1) over(partition by employee_id,cast(activity_time as date) order by activity_time) as logout_time  
+from swipe
+)
+select employee_id,activity_day,
+TIMESTAMPDIFF(HOUR,MIN(activity_time),MAX(logout_time)) as total_hours,
+sum(TIMESTAMPDIFF(HOUR,activity_time,logout_time)) as inside_hour
+from cte
+where activity_type = 'Login'
+group by employee_id,activity_day
 
 
 
