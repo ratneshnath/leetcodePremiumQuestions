@@ -6,7 +6,7 @@ Q1)
 
 Leetcode premium SQL Question Level: Medium.
 
-Day 29 of Solving SQL Problem 87. Q) Flight Occupancy and Waitlist Analysis.
+Problem 87. Q) Flight Occupancy and Waitlist Analysis.
 
 This is similar question to 85 question with twist.
 
@@ -460,6 +460,11 @@ sum(TIMESTAMPDIFF(HOUR,activity_time,logout_time)) as inside_hour
 from cte
 where activity_type = 'Login'
 group by employee_id,activity_day
+
+Alternate method for first problem
+
+select employee_id,max(case when activity_type='logout' then hour(activity_time)end)-min(case when activity_type = 'login' then hour(activity_time) end) as total_hours_spent,extract(day from activity_time) as given_date from swipe
+group by employee_id,given_date
 
 Q.13)
 
